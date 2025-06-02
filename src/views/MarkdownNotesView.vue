@@ -6,9 +6,6 @@
     </div>
     <div v-else-if="errorLoading" class="error-placeholder">
       <p class="error-message">{{ errorLoading }}</p>
-      <p v-if="attemptedPath" class="error-path">
-        Attempted to load: <code>{{ attemptedPath }}</code>
-      </p>
     </div>
     <div v-else class="loading-placeholder">
       <p>Preparing to load notes...</p>
@@ -32,7 +29,6 @@ const route = useRoute()
 const renderedHtmlContent = ref('')
 const isLoading = ref(false)
 const errorLoading = ref(null)
-const attemptedPath = ref('')
 
 const noteNameToShow = computed(() => route.params.noteName || 'unknown note')
 
@@ -46,18 +42,15 @@ async function fetchAndRenderMarkdown(noteFileName) {
   isLoading.value = true
   errorLoading.value = null
   renderedHtmlContent.value = ''
-  attemptedPath.value = `/notes/${noteFileName}.md`
 
   try {
-    const response = await fetch(attemptedPath.value)
-    if (!response.ok) {
-      throw new Error(`File not found or error fetching: ${response.status} ${response.statusText}`)
-    }
-    const markdownText = await response.text()
+    // Import the markdown file as raw text from src/assets/notes/
+    const markdownModule = await import(`@/assets/notes/${noteFileName}.md?raw`)
+    const markdownText = markdownModule.default
     renderedHtmlContent.value = parseMarkdown(markdownText)
   } catch (err) {
-    console.error(`Error loading or parsing markdown for ${noteFileName}:`, err)
-    errorLoading.value = `Could not load notes for "${noteFileName}". Please check the filename and ensure the .md file exists in the public/notes directory.`
+    console.error(`Error loading markdown for ${noteFileName}:`, err)
+    errorLoading.value = `Could not load notes for "${noteFileName}". Please check the filename and ensure the .md file exists in src/assets/notes/.`
   } finally {
     isLoading.value = false
   }
@@ -105,15 +98,6 @@ watch(
   color: #dc2626;
   font-weight: 500;
   margin-bottom: 10px;
-}
-
-.error-path code {
-  background-color: #fef2f2;
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: #dc2626;
-  font-family: 'Geist Mono', 'Fira Code', Consolas, monospace;
-  font-size: 0.9rem;
 }
 
 .navigation-links {
