@@ -1,13 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Home from '../views/HomeView.vue'
 import BasicConcepts from '../views/BasicConcepts.vue'
 import MarkdownNotesView from '../views/MarkdownNotesView.vue'
 
 const routes = [
   {
+    path: '/',
+    name: 'Home',
+    component: Home,
+  },
+  {
     path: '/basic-concepts',
     name: 'BasicConcepts',
     component: BasicConcepts,
-    alias: '/',
   },
   {
     path: '/notes/:noteName',

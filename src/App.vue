@@ -1,11 +1,12 @@
 <template>
   <div id="app-layout">
     <header class="app-header">
-      <div class="logo">CSS Grid Learner</div>
+      <router-link :to="{ name: 'Home' }" class="logo"> Demystify CSS Grid </router-link>
       <nav class="app-nav">
-        <router-link :to="{ name: 'BasicConcepts' }"> Interactive Concepts </router-link>
+        <router-link :to="{ name: 'Home' }">Home</router-link>
+        <router-link :to="{ name: 'BasicConcepts' }">Interactive Concepts</router-link>
         <router-link :to="{ name: 'MarkdownNotes', params: { noteName: 'basic-concepts' } }">
-          Basic Concepts Notes
+          Notes
         </router-link>
       </nav>
     </header>
@@ -19,7 +20,10 @@
     </main>
 
     <footer class="app-footer">
-      <p>&copy; {{ new Date().getFullYear() }} CSS Grid Learning Platform</p>
+      <p>
+        &copy; {{ new Date().getFullYear() }} Demystify CSS Grid by
+        <a class="app__author" href="https://x.com/rajoyish">Rajesh Budhathoki</a>
+      </p>
     </footer>
   </div>
 </template>
@@ -29,13 +33,12 @@
 </script>
 
 <style scoped>
-/* Your existing styles remain the same */
 #app-layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   font-family:
-    'Inter',
+    'Hanken Grotesk',
     -apple-system,
     BlinkMacSystemFont,
     'Segoe UI',
@@ -58,9 +61,15 @@
 }
 
 .logo {
-  font-size: 1.5em;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #2563eb;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.logo:hover {
+  color: #1d4ed8;
 }
 
 .app-nav {
@@ -96,11 +105,15 @@
 }
 
 .app-footer {
-  background-color: #1f2937;
+  background: linear-gradient(135deg, #1041ac, #4e11b8);
   color: #d1d5db;
   text-align: center;
   padding: 20px;
-  font-size: 0.9em;
+  font-size: 0.9rem;
+}
+
+.app__author {
+  color: aqua;
 }
 
 .fade-enter-active,
@@ -111,5 +124,23 @@
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* Responsive navigation */
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 15px 20px;
+  }
+
+  .app-nav {
+    gap: 15px;
+  }
+
+  .app-nav a {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
 }
 </style>
