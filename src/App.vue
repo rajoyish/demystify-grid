@@ -1,26 +1,12 @@
-// src/App.vue
 <template>
   <div id="app-layout">
     <header class="app-header">
       <div class="logo">CSS Grid Learner</div>
       <nav class="app-nav">
-        <router-link :to="{ name: 'BasicConcepts' }">Interactive Concepts</router-link>
-
-        <!--
-          THIS IS LIKELY THE PROBLEMATIC LINK or similar:
-          OLD: <router-link :to="{ name: 'BasicConceptsMd' }">Notes</router-link>
-        -->
-        <!-- CORRECTED LINK: -->
+        <router-link :to="{ name: 'BasicConcepts' }"> Interactive Concepts </router-link>
         <router-link :to="{ name: 'MarkdownNotes', params: { noteName: 'basic-concepts' } }">
           Basic Concepts Notes
         </router-link>
-
-        <!-- Example for another note, if you have 'advanced-topics.md' -->
-        <!--
-        <router-link :to="{ name: 'MarkdownNotes', params: { noteName: 'advanced-topics' } }">
-          Advanced Topics
-        </router-link>
-        -->
       </nav>
     </header>
 
@@ -43,7 +29,7 @@
 </script>
 
 <style scoped>
-/* Scoped styles for App.vue layout */
+/* Your existing styles remain the same */
 #app-layout {
   display: flex;
   flex-direction: column;

@@ -2,11 +2,16 @@
 
 ## What is a Grid?
 
-Imagine a net or a checkerboard. That's kind of like a CSS Grid! It's a system for laying out web page elements in **rows and columns**.
+Imagine a net or a _checkerboard_. That's kind of like a CSS Grid! It's a system for laying out web page elements in **rows and columns**.
 
 Think of it as drawing lines across and down your page. These lines create a pattern of cells, and you can place your content (like text, images, or boxes) precisely within these cells.
 
 **Key Idea:** CSS Grid is **two-dimensional**. This means it handles both width (columns) and height (rows) at the same time. This is different from older methods or even Flexbox, which is mostly one-dimensional (either a row or a column).
+
+| Header 1 | Header 2 |
+| -------- | -------- |
+| Row 1    | Data 1   |
+| Row 2    | Data 2   |
 
 ### Why Use a Grid?
 
