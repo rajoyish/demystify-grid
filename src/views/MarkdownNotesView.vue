@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, onMounted, computed, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { parseMarkdown } from '@/utils/markdownParser.js'
 
@@ -31,6 +31,82 @@ const isLoading = ref(false)
 const errorLoading = ref(null)
 
 const noteNameToShow = computed(() => route.params.noteName || 'unknown note')
+
+// Copy to clipboard function
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (err) {
+    // Fallback for older browsers
+    try {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      return true
+    } catch (fallbackErr) {
+      console.error('Failed to copy text:', fallbackErr)
+      return false
+    }
+  }
+}
+
+// Add copy buttons to code blocks
+function addCopyButtons() {
+  // Wait for the DOM to update
+  nextTick(() => {
+    const codeBlocks = document.querySelectorAll('.markdown-content pre')
+
+    codeBlocks.forEach((block, index) => {
+      // Skip if button already exists
+      if (block.querySelector('.copy-button')) return
+
+      // Create copy button
+      const copyButton = document.createElement('button')
+      copyButton.className = 'copy-button'
+      copyButton.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        <span class="copy-text">Copy</span>
+      `
+
+      // Add click handler
+      copyButton.addEventListener('click', async () => {
+        const codeElement = block.querySelector('code')
+        const textToCopy = codeElement ? codeElement.textContent : block.textContent
+
+        const success = await copyToClipboard(textToCopy)
+
+        if (success) {
+          // Show success feedback
+          const originalHTML = copyButton.innerHTML
+          copyButton.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20,6 9,17 4,12"></polyline>
+            </svg>
+            <span class="copy-text">Copied!</span>
+          `
+          copyButton.classList.add('copied')
+
+          // Reset after 2 seconds
+          setTimeout(() => {
+            copyButton.innerHTML = originalHTML
+            copyButton.classList.remove('copied')
+          }, 2000)
+        }
+      })
+
+      // Position the button
+      block.style.position = 'relative'
+      block.appendChild(copyButton)
+    })
+  })
+}
 
 async function fetchAndRenderMarkdown(noteFileName) {
   if (!noteFileName) {
@@ -48,6 +124,9 @@ async function fetchAndRenderMarkdown(noteFileName) {
     const markdownModule = await import(`@/assets/notes/${noteFileName}.md?raw`)
     const markdownText = markdownModule.default
     renderedHtmlContent.value = parseMarkdown(markdownText)
+
+    // Add copy buttons after content is rendered
+    addCopyButtons()
   } catch (err) {
     console.error(`Error loading markdown for ${noteFileName}:`, err)
     errorLoading.value = `Could not load notes for "${noteFileName}". Please check the filename and ensure the .md file exists in src/assets/notes/.`
@@ -126,7 +205,7 @@ watch(
 </style>
 
 <style>
-/* Minimal global styles - let highlight.js theme handle code styling */
+/* Existing markdown styles... */
 .markdown-content {
   background-color: #fff;
   padding: 30px;
@@ -190,6 +269,7 @@ watch(
   padding: 1rem;
   border-radius: 8px;
   overflow-x: auto;
+  position: relative; /* Important for copy button positioning */
 }
 
 .markdown-content code {
@@ -209,6 +289,48 @@ watch(
   font-size: 1rem;
   font-weight: 700;
   border: 1px solid #24ae90;
+}
+
+/* Copy button styles */
+.copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.copy-button:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+.copy-button.copied {
+  background: transparent;
+  border-color: lime;
+  color: lime;
+}
+
+.copy-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.copy-text {
+  font-family: 'Hanken Grotesk', sans-serif;
 }
 
 /* Links */
